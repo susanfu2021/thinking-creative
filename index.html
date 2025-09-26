@@ -1,0 +1,252 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Unfolding Insight</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* Allow clicks anywhere on the body */
+            cursor: pointer; 
+        }
+
+        .book-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #book-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+        }
+
+        #book-content {
+            text-align: left;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-size: 1.1em;
+            overflow-y: auto;
+            max-height: 50vh;
+            padding-right: 15px;
+        }
+
+        h1, h2, p {
+            margin: 0.5rem 0;
+        }
+
+        #title, #author {
+            color: #222;
+        }
+        
+        #page-number {
+            font-weight: bold;
+            color: #666;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="book-container">
+        <h1 id="title"></h1>
+        <h2 id="author"></h2>
+        <img id="book-image" src="" alt="Book Image">
+        <p id="book-content"></p>
+        <p id="page-number"></p>
+    </div>
+
+    <script>
+        const bookData = {
+  "1": "Dr. Elara sat amidst a towering fortress of books and papers, her brow furrowed in concentration. Her latest research problem, a knot of abstract equations, seemed impenetrable. She had tried every logical pathway, every symbolic manipulation, but the solution remained elusive.",
+  "2": "Days turned into weeks. The elegant symbols on her screen blurred into an indecipherable maze. \"It's all so abstract,\" she sighed to Professor Aris during their weekly meeting. \"I feel like I'm trying to navigate a dark room with only a map written in an unknown language.\"",
+  "3": "Professor Aris, a man whose mind saw beauty in every mathematical structure, smiled gently. \"Perhaps you're trying to read the map without first understanding the landscape, Elara. Sometimes, the most complex truths reveal themselves not through logic alone, but through sight.\"",
+  "4": "He handed her a simple, colourful puzzle. \"Forget your equations for a moment. Just play. See how these pieces fit. How they interact. How their shapes define their possibilities.\" Elara, initially skeptical, took the puzzle.",
+  "5": "Slowly, she began to arrange the pieces. She wasn't thinking about theorems or proofs, but about space, connection, and form. The shapes clicked, forming unexpected patterns. A small spark of understanding ignited within her.",
+  "6": "\"Now,\" Professor Aris continued, \"imagine your equations as these pieces. Each symbol, each operation, has a shape, a movement, a relationship. Can you draw them? Can you build them?\"",
+  "7": "Elara returned to her problem, but this time, her tools were different. She sketched diagrams, built physical models with string and blocks, and even used augmented reality to project her abstract concepts into three-dimensional space.",
+  "8": "She saw the variables not as letters, but as shifting forces. The functions became pathways, the inequalities boundaries. The once-dark room of her problem was now illuminated by a thousand tiny lanterns, each a visual representation.",
+  "9": "And then, it happened. A connection she had never seen before, a hidden symmetry, revealed itself. It wasn't a sudden flash, but a gradual unfolding, like watching a flower bloom in slow motion. The solution was not just logical; it was beautiful.",
+  "10": "Dr. Elara presented her findings, not just with equations, but with vivid illustrations and interactive models. Her peers, initially accustomed to purely symbolic proofs, were captivated. She had not only solved a problem; she had shown them a new way to see.",
+  "title": "The Unfolding Insight",
+  "author": "By AI"
+};
+        
+        const synth = window.speechSynthesis;
+        
+        function speakContent(text) {
+            if (!synth) {
+                console.warn("Speech synthesis not supported.");
+                return;
+            }
+            
+            // Stop any current speech
+            if (synth.speaking) {
+                synth.cancel();
+            }
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            synth.speak(utterance);
+        }
+        
+        function stopSpeaking() {
+            if (synth && synth.speaking) {
+                synth.cancel();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const imageElement = document.getElementById('book-image');
+            const contentElement = document.getElementById('book-content');
+            const titleElement = document.getElementById('title');
+            const authorElement = document.getElementById('author');
+            const pageNumberElement = document.getElementById('page-number');
+            
+            let currentPage = -1; // -1 for cover
+
+            function updateUI() {
+                const bookKeys = Object.keys(bookData);
+                const isCoverPage = currentPage === -1;
+                const isEndPage = currentPage === bookKeys.filter(key => !isNaN(parseInt(key))).length;
+                const totalTextPages = bookKeys.filter(key => !isNaN(parseInt(key))).length;
+                
+                let imagePath, content, title, author, pageText;
+
+                // --- 1. Determine Content and Metadata ---
+                if (isCoverPage) {
+                    title = bookData.title || 'Untitled';
+                    author = bookData.author || 'Unknown Author';
+                    imagePath = `images/${bookData.cover || 'cover.png'}`;
+                    content = bookData.cover_text || '';
+                    pageText = ''; // Removed "Cover Page" text
+                } else if (isEndPage) {
+                    title = bookData.title;
+                    author = bookData.author;
+                    imagePath = `images/end.png`;
+                    content = bookData.end || '';
+                    pageText = 'End Page';
+                } else {
+                    const pageKey = (currentPage + 1).toString();
+                    title = ''; // Hidden on content pages
+                    author = ''; // Hidden on content pages
+                    imagePath = `images/${pageKey}.png`;
+                    content = bookData[pageKey] || '';
+                    pageText = `Page ${pageKey} of ${totalTextPages}`;
+                }
+                
+                // --- 2. Update DOM Elements ---
+                // Show/Hide Title and Author
+                titleElement.style.display = isCoverPage ? 'block' : 'none';
+                authorElement.style.display = isCoverPage ? 'block' : 'none';
+
+                titleElement.textContent = bookData.title;
+                authorElement.textContent = bookData.author;
+                imageElement.src = imagePath;
+                contentElement.textContent = content;
+                pageNumberElement.textContent = pageText;
+                
+                // --- 3. Speech Logic (Speak only the relevant content) ---
+                let speechText;
+                if (isCoverPage) {
+                    // Announce the full title and author on the cover page
+                    speechText = `${bookData.title}. By ${bookData.author}. ${content}`;
+                } else {
+                    // Speak only the content for internal pages
+                    speechText = content;
+                }
+                
+                stopSpeaking();
+                speakContent(speechText);
+            }
+
+            function changePage(direction) {
+                const totalTextPages = Object.keys(bookData).filter(key => !isNaN(parseInt(key))).length;
+                let newPage = currentPage + direction;
+
+                // --- CORE CHANGE: Navigation Looping Logic ---
+                if (direction === 1) { // Moving forward (Next)
+                    if (newPage > totalTextPages) {
+                        // Loop back to the cover page
+                        newPage = -1; 
+                    } else if (newPage > totalTextPages + 1) {
+                         // Prevent overshoot, should only happen if totalTextPages is 0
+                         return;
+                    }
+                } else if (direction === -1) { // Moving backward (Previous)
+                    if (newPage < -1) {
+                        // Prevent going past the cover page
+                        return; 
+                    }
+                }
+                
+                // Only update if the new page is within valid boundaries
+                if (newPage >= -1 && newPage <= totalTextPages) {
+                    currentPage = newPage;
+                    updateUI();
+                }
+            }
+
+            // --- Navigation Logic ---
+
+            // Handle Clicks (Right = Next, Left = Previous)
+            document.body.addEventListener('click', (event) => {
+                const totalTextPages = Object.keys(bookData).filter(key => !isNaN(parseInt(key))).length;
+                const isRightSide = event.clientX > window.innerWidth / 2;
+                
+                if (isRightSide) {
+                    // Next Page logic - loops if on end page
+                    changePage(1);
+                } else {
+                    // Previous Page logic - stops at cover page
+                    if (currentPage > -1) {
+                        changePage(-1);
+                    }
+                }
+            });
+
+            // Handle Key Presses (Enter = Next, Left Arrow = Previous, Right Arrow = Next)
+            document.body.addEventListener('keyup', (event) => {
+                const totalTextPages = Object.keys(bookData).filter(key => !isNaN(parseInt(key))).length;
+                
+                // Check for Enter key (keyCode 13 or key 'Enter')
+                if (event.key === 'Enter' || event.keyCode === 13) {
+                    // Treat Enter as a Next action - loops if on end page
+                    changePage(1);
+                } 
+                // Optional: Allow arrow keys for a common UX pattern
+                else if (event.key === 'ArrowRight' || event.keyCode === 39) {
+                    // Next action - loops if on end page
+                    changePage(1);
+                } else if (event.key === 'ArrowLeft' || event.keyCode === 37) {
+                    // Previous action - stops at cover page
+                    if (currentPage > -1) {
+                        changePage(-1);
+                    }
+                }
+            });
+            
+            updateUI(); // Initial UI setup
+        });
+    </script>
+</body>
+</html>
