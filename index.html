@@ -7,7 +7,7 @@
     <title>The Unfolding Insight</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif; /* Added Chinese font */
             background-color: #f0f0f0;
             color: #333;
             margin: 0;
@@ -15,7 +15,6 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            /* Allow clicks anywhere on the body */
             cursor: pointer; 
         }
 
@@ -30,6 +29,21 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative; /* For the button */
+        }
+        
+        #lang-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 10;
         }
 
         #book-image {
@@ -69,6 +83,7 @@
 </head>
 <body>
     <div class="book-container">
+        <button id="lang-toggle">Change Language (EN)</button>
         <h1 id="title"></h1>
         <h2 id="author"></h2>
         <img id="book-image" src="" alt="Book Image">
@@ -77,22 +92,46 @@
     </div>
 
     <script>
-        const bookData = {
-  "1": "Dr. Elara sat amidst a towering fortress of books and papers, her brow furrowed in concentration. Her latest research problem, a knot of abstract equations, seemed impenetrable. She had tried every logical pathway, every symbolic manipulation, but the solution remained elusive.",
-  "2": "Days turned into weeks. The elegant symbols on her screen blurred into an indecipherable maze. \"It's all so abstract,\" she sighed to Professor Aris during their weekly meeting. \"I feel like I'm trying to navigate a dark room with only a map written in an unknown language.\"",
-  "3": "Professor Aris, a man whose mind saw beauty in every mathematical structure, smiled gently. \"Perhaps you're trying to read the map without first understanding the landscape, Elara. Sometimes, the most complex truths reveal themselves not through logic alone, but through sight.\"",
-  "4": "He handed her a simple, colourful puzzle. \"Forget your equations for a moment. Just play. See how these pieces fit. How they interact. How their shapes define their possibilities.\" Elara, initially skeptical, took the puzzle.",
-  "5": "Slowly, she began to arrange the pieces. She wasn't thinking about theorems or proofs, but about space, connection, and form. The shapes clicked, forming unexpected patterns. A small spark of understanding ignited within her.",
-  "6": "\"Now,\" Professor Aris continued, \"imagine your equations as these pieces. Each symbol, each operation, has a shape, a movement, a relationship. Can you draw them? Can you build them?\"",
-  "7": "Elara returned to her problem, but this time, her tools were different. She sketched diagrams, built physical models with string and blocks, and even used augmented reality to project her abstract concepts into three-dimensional space.",
-  "8": "She saw the variables not as letters, but as shifting forces. The functions became pathways, the inequalities boundaries. The once-dark room of her problem was now illuminated by a thousand tiny lanterns, each a visual representation.",
-  "9": "And then, it happened. A connection she had never seen before, a hidden symmetry, revealed itself. It wasn't a sudden flash, but a gradual unfolding, like watching a flower bloom in slow motion. The solution was not just logical; it was beautiful.",
-  "10": "Dr. Elara presented her findings, not just with equations, but with vivid illustrations and interactive models. Her peers, initially accustomed to purely symbolic proofs, were captivated. She had not only solved a problem; she had shown them a new way to see.",
-  "title": "The Unfolding Insight",
-  "author": "By AI"
+        const ALL_BOOK_DATA = {
+  "en": {
+    "1": "Dr. Elara sat amidst a towering fortress of books and papers, her brow furrowed in concentration. Her latest research problem, a knot of abstract equations, seemed impenetrable. She had tried every logical pathway, every symbolic manipulation, but the solution remained elusive.",
+    "2": "Days turned into weeks. The elegant symbols on her screen blurred into an indecipherable maze. \"It's all so abstract,\" she sighed to Professor Aris during their weekly meeting. \"I feel like I'm trying to navigate a dark room with only a map written in an unknown language.\"",
+    "3": "Professor Aris, a man whose mind saw beauty in every mathematical structure, smiled gently. \"Perhaps you're trying to read the map without first understanding the landscape, Elara. Sometimes, the most complex truths reveal themselves not through logic alone, but through sight.\"",
+    "4": "He handed her a simple, colourful puzzle. \"Forget your equations for a moment. Just play. See how these pieces fit. How they interact. How their shapes define their possibilities.\" Elara, initially skeptical, took the puzzle.",
+    "5": "Slowly, she began to arrange the pieces. She wasn't thinking about theorems or proofs, but about space, connection, and form. The shapes clicked, forming unexpected patterns. A small spark of understanding ignited within her.",
+    "6": "\"Now,\" Professor Aris continued, \"imagine your equations as these pieces. Each symbol, each operation, has a shape, a movement, a relationship. Can you draw them? Can you build them?\"",
+    "7": "Elara returned to her problem, but this time, her tools were different. She sketched diagrams, built physical models with string and blocks, and even used augmented reality to project her abstract concepts into three-dimensional space.",
+    "8": "She saw the variables not as letters, but as shifting forces. The functions became pathways, the inequalities boundaries. The once-dark room of her problem was now illuminated by a thousand tiny lanterns, each a visual representation.",
+    "9": "And then, it happened. A connection she had never seen before, a hidden symmetry, revealed itself. It wasn't a sudden flash, but a gradual unfolding, like watching a flower bloom in slow motion. The solution was not just logical; it was beautiful.",
+    "10": "Dr. Elara presented her findings, not just with equations, but with vivid illustrations and interactive models. Her peers, initially accustomed to purely symbolic proofs, were captivated. She had not only solved a problem; she had shown them a new way to see.",
+    "title": "The Unfolding Insight",
+    "author": "By AI"
+  },
+  "zh": {
+    "1": "艾拉博士坐在堆积如山的书籍和文件堡垒之中，眉头紧锁，全神贯注。她最新的研究问题，一个抽象方程的死结，似乎坚不可摧。她尝试了所有逻辑路径，每一种符号操作，但答案依然难以捉摸。",
+    "2": "几天变成了几周。屏幕上优雅的符号模糊成一个难以辨认的迷宫。“这一切都太抽象了，”她在每周会议中对阿里斯教授叹息道。“我感觉自己像是在试图用一张以未知语言写成的地图，来导航一间黑暗的房间。”",
+    "3": "阿里斯教授，一位头脑能看到每一种数学结构之美的人，温和地笑了。“或许你正试图在不先理解这片风景的情况下阅读地图，艾拉。有时候，最复杂的真理并非仅通过逻辑来揭示，而是通过视觉。”",
+    "4": "他递给她一个简单、色彩鲜艳的拼图。“暂时忘记你的方程。只是玩。看看这些碎片如何契合。它们如何互动。它们的形状如何界定它们的可能性。”艾拉最初持怀疑态度，但还是接过了拼图。",
+    "5": "她慢慢开始排列碎片。她思考的不是定理或证明，而是空间、连接和形式。形状咔嗒一声咬合，形成了意想不到的图案。一小束理解的火花在她内心被点燃。",
+    "6": "“现在，”阿里斯教授继续说道，“想象你的方程就是这些碎片。每一个符号，每一个运算，都拥有一个形状、一种运动、一种关系。你能把它们画出来吗？你能把它们建构出来吗？”",
+    "7": "艾拉回到了她的问题，但这一次，她的工具与众不同。她绘制图表，用绳子和积木制作物理模型，甚至使用增强现实将她的抽象概念投射到三维空间中。",
+    "8": "她将变量视为不断变化的力量，而不再是字母。函数变成了路径，不等式成为了边界。她问题中曾经黑暗的房间，现在被数千盏小灯照亮，每一盏灯都是一个视觉化的表征。",
+    "9": "然后，它发生了。一个她从未见过的连接，一种隐藏的对称，自行显现。这不是突如其来的闪光，而是渐次展开，就像慢动作中看着一朵花绽放。解决方案不仅是逻辑的；它是美丽的。",
+    "10": "艾拉博士展示了她的发现，不仅使用了方程，还使用了生动的插图和交互式模型。她的同行们最初习惯于纯粹的符号证明，现在被深深吸引。她不仅解决了问题；她向他们展示了一种新的观看方式。",
+    "title": "渐次展开的洞察",
+    "author": "作者 人工智能"
+  }
 };
         
         const synth = window.speechSynthesis;
+        let currentLang = 'en'; // Default language is English
+        let currentPage = -1; // -1 for cover
+
+        // Mapping language codes to speech voices (adjust these to specific voices if needed)
+        const VOICE_MAP = {
+            'en': 'en-US',
+            'zh': 'zh-CN' 
+        };
         
         function speakContent(text) {
             if (!synth) {
@@ -100,12 +139,24 @@
                 return;
             }
             
-            // Stop any current speech
             if (synth.speaking) {
                 synth.cancel();
             }
 
             const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Set the language voice based on the current locale
+            const voiceCode = VOICE_MAP[currentLang];
+            const voices = synth.getVoices();
+            const selectedVoice = voices.find(voice => voice.lang === voiceCode) || null;
+            
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            } else {
+                // Fallback: set the language tag
+                utterance.lang = voiceCode;
+            }
+
             synth.speak(utterance);
         }
         
@@ -115,47 +166,63 @@
             }
         }
 
+        function getBookData() {
+            return ALL_BOOK_DATA[currentLang];
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const imageElement = document.getElementById('book-image');
             const contentElement = document.getElementById('book-content');
             const titleElement = document.getElementById('title');
             const authorElement = document.getElementById('author');
             const pageNumberElement = document.getElementById('page-number');
+            const langToggleButton = document.getElementById('lang-toggle');
+
+            // Function to toggle language
+            function toggleLanguage() {
+                currentLang = currentLang === 'en' ? 'zh' : 'en';
+                langToggleButton.textContent = `Change Language (${currentLang.toUpperCase()})`;
+                currentPage = -1; // Reset to cover page on language change
+                updateUI();
+            }
             
-            let currentPage = -1; // -1 for cover
+            langToggleButton.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent the click from triggering page navigation
+                toggleLanguage();
+            });
 
             function updateUI() {
+                const bookData = getBookData();
                 const bookKeys = Object.keys(bookData);
                 const isCoverPage = currentPage === -1;
-                const isEndPage = currentPage === bookKeys.filter(key => !isNaN(parseInt(key))).length;
                 const totalTextPages = bookKeys.filter(key => !isNaN(parseInt(key))).length;
-                
+                const isEndPage = currentPage === totalTextPages;
+
                 let imagePath, content, title, author, pageText;
 
                 // --- 1. Determine Content and Metadata ---
                 if (isCoverPage) {
                     title = bookData.title || 'Untitled';
-                    author = bookData.author || 'Unknown Author';
+                    author = bookData.author || '';
                     imagePath = `images/${bookData.cover || 'cover.png'}`;
                     content = bookData.cover_text || '';
-                    pageText = ''; // Removed "Cover Page" text
+                    pageText = '';
                 } else if (isEndPage) {
                     title = bookData.title;
                     author = bookData.author;
                     imagePath = `images/end.png`;
                     content = bookData.end || '';
-                    pageText = 'End Page';
+                    pageText = currentLang === 'en' ? 'End Page' : '结束页';
                 } else {
                     const pageKey = (currentPage + 1).toString();
-                    title = ''; // Hidden on content pages
-                    author = ''; // Hidden on content pages
+                    title = '';
+                    author = '';
                     imagePath = `images/${pageKey}.png`;
                     content = bookData[pageKey] || '';
-                    pageText = `Page ${pageKey} of ${totalTextPages}`;
+                    pageText = `${currentLang === 'en' ? 'Page' : '页'} ${pageKey} ${currentLang === 'en' ? 'of' : '共'} ${totalTextPages}`;
                 }
                 
                 // --- 2. Update DOM Elements ---
-                // Show/Hide Title and Author
                 titleElement.style.display = isCoverPage ? 'block' : 'none';
                 authorElement.style.display = isCoverPage ? 'block' : 'none';
 
@@ -165,13 +232,11 @@
                 contentElement.textContent = content;
                 pageNumberElement.textContent = pageText;
                 
-                // --- 3. Speech Logic (Speak only the relevant content) ---
+                // --- 3. Speech Logic ---
                 let speechText;
                 if (isCoverPage) {
-                    // Announce the full title and author on the cover page
                     speechText = `${bookData.title}. By ${bookData.author}. ${content}`;
                 } else {
-                    // Speak only the content for internal pages
                     speechText = content;
                 }
                 
@@ -180,65 +245,50 @@
             }
 
             function changePage(direction) {
+                const bookData = getBookData();
                 const totalTextPages = Object.keys(bookData).filter(key => !isNaN(parseInt(key))).length;
                 let newPage = currentPage + direction;
 
-                // --- CORE CHANGE: Navigation Looping Logic ---
+                // Looping Logic (End Page to Cover Page)
                 if (direction === 1) { // Moving forward (Next)
                     if (newPage > totalTextPages) {
-                        // Loop back to the cover page
-                        newPage = -1; 
-                    } else if (newPage > totalTextPages + 1) {
-                         // Prevent overshoot, should only happen if totalTextPages is 0
-                         return;
+                        newPage = -1; // Loop back to the cover page
                     }
                 } else if (direction === -1) { // Moving backward (Previous)
                     if (newPage < -1) {
-                        // Prevent going past the cover page
-                        return; 
+                        return; // Stop at the cover page
                     }
                 }
                 
-                // Only update if the new page is within valid boundaries
                 if (newPage >= -1 && newPage <= totalTextPages) {
                     currentPage = newPage;
                     updateUI();
                 }
             }
 
-            // --- Navigation Logic ---
-
-            // Handle Clicks (Right = Next, Left = Previous)
+            // --- Navigation Event Handlers (Click and Keypress) ---
             document.body.addEventListener('click', (event) => {
-                const totalTextPages = Object.keys(bookData).filter(key => !isNaN(parseInt(key))).length;
+                // Check if the click was on the language toggle button; if so, do nothing.
+                if (event.target.id === 'lang-toggle') return;
+
                 const isRightSide = event.clientX > window.innerWidth / 2;
-                
                 if (isRightSide) {
-                    // Next Page logic - loops if on end page
                     changePage(1);
                 } else {
-                    // Previous Page logic - stops at cover page
                     if (currentPage > -1) {
                         changePage(-1);
                     }
                 }
             });
 
-            // Handle Key Presses (Enter = Next, Left Arrow = Previous, Right Arrow = Next)
             document.body.addEventListener('keyup', (event) => {
-                const totalTextPages = Object.keys(bookData).filter(key => !isNaN(parseInt(key))).length;
-                
                 // Check for Enter key (keyCode 13 or key 'Enter')
                 if (event.key === 'Enter' || event.keyCode === 13) {
-                    // Treat Enter as a Next action - loops if on end page
                     changePage(1);
                 } 
-                // Optional: Allow arrow keys for a common UX pattern
                 else if (event.key === 'ArrowRight' || event.keyCode === 39) {
-                    // Next action - loops if on end page
                     changePage(1);
                 } else if (event.key === 'ArrowLeft' || event.keyCode === 37) {
-                    // Previous action - stops at cover page
                     if (currentPage > -1) {
                         changePage(-1);
                     }
